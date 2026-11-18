@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # JiraFlow Backend API Service
+  # ==========================================
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: jiraflow-api
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      # MongoDB Atlas URI (Provide your Atlas connection string in .env file)
+      # e.g.: mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/jira_task_manager?retryWrites=true&w=majority
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/jira_task_manager}
+      - JWT_SECRET=${JWT_SECRET:-jira_production_secret_key_2026_super_secure}
+      - JWT_EXPIRE=7d
+      - CLIENT_URL=http://localhost:3000
+      - MAX_FILE_SIZE_MB=15
+    volumes:
+      - server_uploads:/app/uploads
+    networks:
+      - jiraflow-network
+    # If using local container fallback, wait for mongodb
+    # depends_on:
+    #   - mongodb
+
+  # ==========================================
+  # JiraFlow Frontend Client Service (Nginx)
+  # ==========================================
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: jiraflow-ui
+    restart: unless-stopped
+    ports:
+      - '3000:80'
+    depends_on:
+      - server
+    networks:
+      - jiraflow-network
+
+  # ==========================================
+  # Optional: Local MongoDB Container Fallback
+  # (Uncomment if you want a local DB instead of MongoDB Atlas)
+  # ==========================================
+  # mongodb:
+  #   image: mongo:6.0
+  #   container_name: jiraflow-mongodb
+  #   restart: unless-stopped
+  #   ports:
+  #     - '27017:27017'
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   networks:
+  #     - jiraflow-network
+
+networks:
+  jiraflow-network:
+    driver: bridge
+
+volumes:
+  server_uploads:
+    driver: local
+  mongo_data:
+    driver: local

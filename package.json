@@ -1,0 +1,27 @@
+{
+  "name": "jira-task-management-system",
+  "version": "1.0.0",
+  "description": "Enterprise Production-Ready Jira-Style Task Management System (MERN Stack + MongoDB Atlas + Docker)",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "seed": "npm run seed --prefix server",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "build:client": "npm run build --prefix client",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "keywords": [
+    "jira",
+    "task-management",
+    "kanban",
+    "mern",
+    "mongodb-atlas",
+    "docker",
+    "react",
+    "express"
+  ],
+  "author": "Senior MERN Stack Architect",
+  "license": "MIT"
+}
