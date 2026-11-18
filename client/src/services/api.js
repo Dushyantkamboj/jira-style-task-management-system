@@ -1,6 +1,23 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const rawApiBase = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = rawApiBase.replace(/\/+$/, '');
+
+export const getFileUrl = (pathOrUrl) => {
+  if (!pathOrUrl) return '';
+  if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
+    return pathOrUrl;
+  }
+  if (API_BASE.startsWith('http')) {
+    try {
+      const origin = new URL(API_BASE).origin;
+      return `${origin}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
+    } catch {
+      return pathOrUrl;
+    }
+  }
+  return pathOrUrl;
+};
 
 const api = axios.create({
   baseURL: API_BASE,

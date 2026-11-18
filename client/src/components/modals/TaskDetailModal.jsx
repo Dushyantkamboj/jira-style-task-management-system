@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
+import { getFileUrl } from '../../services/api';
 import Avatar from '../common/Avatar';
 import PriorityBadge from '../common/PriorityBadge';
 import StatusBadge from '../common/StatusBadge';
@@ -241,6 +242,7 @@ export const TaskDetailModal = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedTask.attachments.map((att) => {
                     const isImg = att.mimeType.startsWith('image/');
+                    const fileUrl = getFileUrl(att.url);
                     return (
                       <div
                         key={att._id}
@@ -249,7 +251,7 @@ export const TaskDetailModal = () => {
                         <div className="flex items-center gap-2.5 min-w-0">
                           {isImg ? (
                             <img
-                              src={att.url}
+                              src={fileUrl}
                               alt={att.originalName}
                               className="w-9 h-9 rounded object-cover border border-gray-200 flex-shrink-0"
                             />
@@ -260,7 +262,7 @@ export const TaskDetailModal = () => {
                           )}
                           <div className="min-w-0">
                             <a
-                              href={att.url}
+                              href={fileUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="text-xs font-semibold text-jira-dark truncate block hover:text-jira-blue hover:underline"
@@ -276,7 +278,7 @@ export const TaskDetailModal = () => {
 
                         <div className="flex items-center gap-1 ml-2">
                           <a
-                            href={att.url}
+                            href={fileUrl}
                             download={att.originalName}
                             target="_blank"
                             rel="noreferrer"

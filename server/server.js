@@ -48,8 +48,10 @@ app.use(
 app.use(compression());
 
 // CORS Configuration
+const configuredClientUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.replace(/\/+$/, '') : null;
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  configuredClientUrl,
+  'https://jira-style-task-management-system-3.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
   'http://127.0.0.1:5173',
@@ -59,11 +61,19 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      // Allow requests with no origin (like mobile apps, curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.replace(/\/+$/, '');
+      const isAllowed =
+        allowedOrigins.includes(normalizedOrigin) ||
+        normalizedOrigin.endsWith('.vercel.app') ||
+        process.env.NODE_ENV !== 'production';
+
+      if (isAllowed) {
         return callback(null, true);
       }
-      return callback(new Error('Blocked by CORS policy'));
+      return callback(new Error(`Blocked by CORS policy for origin: ${origin}`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
